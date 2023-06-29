@@ -1457,8 +1457,8 @@ void rasterizeAndIntervalizeNoFloodFill(Polygon &pol, Section &sec){
 
 	// timer = clock();
 	//compute all/full intervals
-	computeIntervalsNoFloodFill(pol);
-	// computeIntervalsNoFloodFillEnhanced(pol);
+	// computeIntervalsNoFloodFill(pol);
+	computeIntervalsNoFloodFillEnhanced(pol);
 
 	// intervalization_time += (clock()-timer) / (double)(CLOCKS_PER_SEC);
 
