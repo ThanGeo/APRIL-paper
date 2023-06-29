@@ -20,6 +20,10 @@
 #include "omp.h"
 #include <functional>
 #include <array>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <errno.h>
 
 #include "./APRIL/april-main.h"
 
@@ -274,6 +278,34 @@ void initialize(string &arg1, string &arg2){
         //reset result file
         ofstream fout(result_filename, fstream::out | ios_base::binary);
         fout.close();
+
+        //check if APRIL dirs exists
+        DIR* dirUncompressed = opendir("APRIL/interval_data/uncompressed/");
+        if(dirUncompressed) {
+                /* Directory exists. */
+                closedir(dirUncompressed);
+        }else if(ENOENT == errno) {
+                /* Directory does not exist. */
+                mkdir("APRIL/interval_data/uncompressed/", 0700);
+        }else{
+                /* opendir() failed for some other reason. */
+                cout << "Init error: Cannot open directory 'APRIL/interval_data/uncompressed/'" << endl;
+                exit(-1);
+        }
+        DIR* dirCompressed = opendir("APRIL/interval_data/compressed/");
+        if(dirCompressed) {
+                /* Directory exists. */
+                closedir(dirCompressed);
+        }else if(ENOENT == errno) {
+                /* Directory does not exist. */
+                mkdir("APRIL/interval_data/compressed/", 0700);
+        }else{
+                /* opendir() failed for some other reason. */
+                cout << "Init error: Cannot open directory 'APRIL/interval_data/compressed/'" << endl;
+                exit(-1);
+        }
+
+
 
         cout << "***************************************************" << endl;
         cout << "*************** APRIL configuration: **************" << endl;
