@@ -1,0 +1,483 @@
+-------------RASTERIZATION TESTS BEGINS-------------
+
+
+1. T1NA T3NA
+N = 16, ID set to uint
+***************************************************
+*************** APRIL configuration: **************
+-Datasets (R & S): 		T1NA & T3NA
+-Partitions: 			1
+-Compression: 			no
+-Data: 					polygon-polygon
+-Query: 				intersection join
+-Galloping: 			no
+-Granularity: 			16-16
+***************************************************
+Pipeline: 
+MBR-join -> Intermediate Filter -> Refinement Stage -> Result
+***************************************************
+
+***************************************************
+Initializing MBR-join... 
+Finished: sizes 123045 (T1NA) & 3043 (T3NA) objects in the datasets.
+***************************************************
+Creating APRIL approximation for polygon dataset T1NA
+  Pre-processing time: 3.55946 sec.
+Finished in 3.737524 seconds.
+***************************************************
+***************************************************
+Creating APRIL approximation for polygon dataset T3NA
+  Pre-processing time: 75.144994 sec.
+Finished in 75.396018 seconds.
+***************************************************
+Loading datasets' APRIL... 
+Finished.
+Evaluating query...
+Finished!
+***************************************************
+
+**********************SUMMARY**********************
+***************************************************
+Total time: 						0.563579 sec.
+	-MBR-join time: 				0.048074 sec.
+	-Intermediate Filter time: 		0.180497 sec.
+	-Refinement time: 				0.335008 sec.
+***************************************************
+Intermediate Filter Effectiveness: 
+	-Accepted: 				69.84%
+	-Rejected: 				28.13%
+	-Inconclusive: 			2.03%
+***************************************************
+Candidate Analysis: 
+	-Candidates after MBR Filter: 	168979
+	-Candidates after Refinement: 	3431
+		--Average # of vertices of ref. candidates in T1NA: 	92.9 vertices.
+		--Average # of vertices of ref. candidates in T3NA: 	2791.2 vertices.
+***************************************************
+Query Result: 120656 pairs.
+***************************************************
+
+
+------------------------------------------------------------------------------------------------------------------
+
+
+2. T1NA T2NA
+N = 16, ID set to uint
+***************************************************
+*************** APRIL configuration: **************
+-Datasets (R & S): 		T1NA & T2NA
+-Partitions: 			1
+-Compression: 			no
+-Data: 					polygon-polygon
+-Query: 				intersection join
+-Galloping: 			no
+-Granularity: 			16-16
+***************************************************
+Pipeline: 
+MBR-join -> Intermediate Filter -> Refinement Stage -> Result
+***************************************************
+
+***************************************************
+Initializing MBR-join... 
+Finished: sizes 123045 (T1NA) & 2252316 (T2NA) objects in the datasets.
+***************************************************
+Creating APRIL approximation for polygon dataset T1NA
+  Pre-processing time: 3.5744 sec.
+Finished in 3.756042 seconds.
+***************************************************
+***************************************************
+Creating APRIL approximation for polygon dataset T2NA
+  Pre-processing time: 30.275863 sec.
+Finished in 33.764344 seconds.
+***************************************************
+Loading datasets' APRIL... 
+Finished.
+Evaluating query...
+Finished!
+***************************************************
+
+**********************SUMMARY**********************
+***************************************************
+Total time: 						0.345136 sec.
+	-MBR-join time: 				0.029918 sec.
+	-Intermediate Filter time: 		0.050848 sec.
+	-Refinement time: 				0.264370 sec.
+***************************************************
+Intermediate Filter Effectiveness: 
+	-Accepted: 				24.29%
+	-Rejected: 				59.42%
+	-Inconclusive: 			16.29%
+***************************************************
+Candidate Analysis: 
+	-Candidates after MBR Filter: 	63319
+	-Candidates after Refinement: 	10314
+		--Average # of vertices of ref. candidates in T1NA: 	188.1 vertices.
+		--Average # of vertices of ref. candidates in T2NA: 	415.4 vertices.
+***************************************************
+Query Result: 21858 pairs.
+***************************************************
+
+
+------------------------------------------------------------------------------------------------------------------
+
+
+3. O5_Africa O6_Africa
+N = 16, ID set to uint
+***************************************************
+*************** APRIL configuration: **************
+-Datasets (R & S): 		O5_Africa & O6_Africa
+-Partitions: 			1
+-Compression: 			no
+-Data: 					polygon-polygon
+-Query: 				intersection join
+-Galloping: 			no
+-Granularity: 			16-16
+***************************************************
+Pipeline: 
+MBR-join -> Intermediate Filter -> Refinement Stage -> Result
+***************************************************
+
+***************************************************
+Initializing MBR-join... 
+Finished: sizes 72490 (O5_Africa) & 191590 (O6_Africa) objects in the datasets.
+***************************************************
+Creating APRIL approximation for polygon dataset O5_Africa
+  Pre-processing time: 11.0042 sec.
+Finished in 11.185876 seconds.
+***************************************************
+***************************************************
+Creating APRIL approximation for polygon dataset O6_Africa
+  Pre-processing time: 5.656389 sec.
+Finished in 6.001501 seconds.
+***************************************************
+Loading datasets' APRIL... 
+Finished.
+Evaluating query...
+Finished!
+***************************************************
+
+**********************SUMMARY**********************
+***************************************************
+Total time: 						0.437580 sec.
+	-MBR-join time: 				0.024092 sec.
+	-Intermediate Filter time: 		0.049994 sec.
+	-Refinement time: 				0.363494 sec.
+***************************************************
+Intermediate Filter Effectiveness: 
+	-Accepted: 				14.76%
+	-Rejected: 				58.31%
+	-Inconclusive: 			26.92%
+***************************************************
+Candidate Analysis: 
+	-Candidates after MBR Filter: 	51205
+	-Candidates after Refinement: 	13786
+		--Average # of vertices of ref. candidates in O5_Africa: 	328.8 vertices.
+		--Average # of vertices of ref. candidates in O6_Africa: 	205.0 vertices.
+***************************************************
+Query Result: 12496 pairs.
+***************************************************
+
+
+------------------------------------------------------------------------------------------------------------------
+
+
+4. O5_Asia O6_Asia
+N = 16, ID set to uint
+***************************************************
+*************** APRIL configuration: **************
+-Datasets (R & S): 		O5_Asia & O6_Asia
+-Partitions: 			1
+-Compression: 			no
+-Data: 					polygon-polygon
+-Query: 				intersection join
+-Galloping: 			no
+-Granularity: 			16-16
+***************************************************
+Pipeline: 
+MBR-join -> Intermediate Filter -> Refinement Stage -> Result
+***************************************************
+
+***************************************************
+Initializing MBR-join... 
+Finished: sizes 447373 (O5_Asia) & 622573 (O6_Asia) objects in the datasets.
+***************************************************
+Creating APRIL approximation for polygon dataset O5_Asia
+  Pre-processing time: 21.2818 sec.
+Finished in 22.203667 seconds.
+***************************************************
+***************************************************
+Creating APRIL approximation for polygon dataset O6_Asia
+  Pre-processing time: 65.014127 sec.
+Finished in 66.233109 seconds.
+***************************************************
+Loading datasets' APRIL... 
+Finished.
+Evaluating query...
+Finished!
+***************************************************
+
+**********************SUMMARY**********************
+***************************************************
+Total time: 						7.824210 sec.
+	-MBR-join time: 				0.128822 sec.
+	-Intermediate Filter time: 		0.329272 sec.
+	-Refinement time: 				7.366116 sec.
+***************************************************
+Intermediate Filter Effectiveness: 
+	-Accepted: 				7.16%
+	-Rejected: 				62.07%
+	-Inconclusive: 			30.76%
+***************************************************
+Candidate Analysis: 
+	-Candidates after MBR Filter: 	337775
+	-Candidates after Refinement: 	103914
+		--Average # of vertices of ref. candidates in O5_Asia: 	415.4 vertices.
+		--Average # of vertices of ref. candidates in O6_Asia: 	1462.8 vertices.
+***************************************************
+Query Result: 50908 pairs.
+***************************************************
+
+
+------------------------------------------------------------------------------------------------------------------
+
+
+5. O5_Europe O6_Europe
+N = 16, ID set to uint
+***************************************************
+*************** APRIL configuration: **************
+-Datasets (R & S): 		O5_Europe & O6_Europe
+-Partitions: 			1
+-Compression: 			no
+-Data: 					polygon-polygon
+-Query: 				intersection join
+-Galloping: 			no
+-Granularity: 			16-16
+***************************************************
+Pipeline: 
+MBR-join -> Intermediate Filter -> Refinement Stage -> Result
+***************************************************
+
+***************************************************
+Initializing MBR-join... 
+Finished: sizes 1969158 (O5_Europe) & 7179017 (O6_Europe) objects in the datasets.
+***************************************************
+Creating APRIL approximation for polygon dataset O5_Europe
+  Pre-processing time: 55.786 sec.
+Finished in 59.118777 seconds.
+***************************************************
+***************************************************
+Creating APRIL approximation for polygon dataset O6_Europe
+  Pre-processing time: 243.173492 sec.
+Finished in 255.537468 seconds.
+***************************************************
+Loading datasets' APRIL... 
+Finished.
+Evaluating query...
+Finished!
+***************************************************
+
+**********************SUMMARY**********************
+***************************************************
+Total time: 						44.024692 sec.
+	-MBR-join time: 				2.102249 sec.
+	-Intermediate Filter time: 		4.778330 sec.
+	-Refinement time: 				37.144113 sec.
+***************************************************
+Intermediate Filter Effectiveness: 
+	-Accepted: 				10.66%
+	-Rejected: 				55.02%
+	-Inconclusive: 			34.32%
+***************************************************
+Candidate Analysis: 
+	-Candidates after MBR Filter: 	5187768
+	-Candidates after Refinement: 	1780318
+		--Average # of vertices of ref. candidates in O5_Europe: 	190.4 vertices.
+		--Average # of vertices of ref. candidates in O6_Europe: 	118.6 vertices.
+***************************************************
+Query Result: 1394144 pairs.
+***************************************************
+
+
+------------------------------------------------------------------------------------------------------------------
+
+
+6. O5_NorthAmerica O6_NorthAmerica
+N = 16, ID set to uint
+***************************************************
+*************** APRIL configuration: **************
+-Datasets (R & S): 		O5_NorthAmerica & O6_NorthAmerica
+-Partitions: 			1
+-Compression: 			no
+-Data: 					polygon-polygon
+-Query: 				intersection join
+-Galloping: 			no
+-Granularity: 			16-16
+***************************************************
+Pipeline: 
+MBR-join -> Intermediate Filter -> Refinement Stage -> Result
+***************************************************
+
+***************************************************
+Initializing MBR-join... 
+Finished: sizes 4022636 (O5_NorthAmerica) & 999366 (O6_NorthAmerica) objects in the datasets.
+***************************************************
+Creating APRIL approximation for polygon dataset O5_NorthAmerica
+  Pre-processing time: 133.388 sec.
+Finished in 140.375521 seconds.
+***************************************************
+***************************************************
+Creating APRIL approximation for polygon dataset O6_NorthAmerica
+  Pre-processing time: 51.791548 sec.
+Finished in 53.973399 seconds.
+***************************************************
+Loading datasets' APRIL... 
+Finished.
+Evaluating query...
+Finished!
+***************************************************
+
+**********************SUMMARY**********************
+***************************************************
+Total time: 						26.816452 sec.
+	-MBR-join time: 				0.918709 sec.
+	-Intermediate Filter time: 		2.533880 sec.
+	-Refinement time: 				23.363863 sec.
+***************************************************
+Intermediate Filter Effectiveness: 
+	-Accepted: 				43.62%
+	-Rejected: 				34.12%
+	-Inconclusive: 			22.26%
+***************************************************
+Candidate Analysis: 
+	-Candidates after MBR Filter: 	2774611
+	-Candidates after Refinement: 	617615
+		--Average # of vertices of ref. candidates in O5_NorthAmerica: 	580.9 vertices.
+		--Average # of vertices of ref. candidates in O6_NorthAmerica: 	411.5 vertices.
+***************************************************
+Query Result: 1643659 pairs.
+***************************************************
+
+
+------------------------------------------------------------------------------------------------------------------
+
+
+7. O5_Oceania O6_Oceania
+N = 16, ID set to uint
+***************************************************
+*************** APRIL configuration: **************
+-Datasets (R & S): 		O5_Oceania & O6_Oceania
+-Partitions: 			1
+-Compression: 			no
+-Data: 					polygon-polygon
+-Query: 				intersection join
+-Galloping: 			no
+-Granularity: 			16-16
+***************************************************
+Pipeline: 
+MBR-join -> Intermediate Filter -> Refinement Stage -> Result
+***************************************************
+
+***************************************************
+Initializing MBR-join... 
+Finished: sizes 107764 (O5_Oceania) & 223937 (O6_Oceania) objects in the datasets.
+***************************************************
+Creating APRIL approximation for polygon dataset O5_Oceania
+  Pre-processing time: 3.8199 sec.
+Finished in 4.043968 seconds.
+***************************************************
+***************************************************
+Creating APRIL approximation for polygon dataset O6_Oceania
+  Pre-processing time: 20.751718 sec.
+Finished in 21.178773 seconds.
+***************************************************
+Loading datasets' APRIL... 
+Finished.
+Evaluating query...
+Finished!
+***************************************************
+
+**********************SUMMARY**********************
+***************************************************
+Total time: 						1.467997 sec.
+	-MBR-join time: 				0.038954 sec.
+	-Intermediate Filter time: 		0.097451 sec.
+	-Refinement time: 				1.331592 sec.
+***************************************************
+Intermediate Filter Effectiveness: 
+	-Accepted: 				16.94%
+	-Rejected: 				58.64%
+	-Inconclusive: 			24.42%
+***************************************************
+Candidate Analysis: 
+	-Candidates after MBR Filter: 	102025
+	-Candidates after Refinement: 	24917
+		--Average # of vertices of ref. candidates in O5_Oceania: 	589.1 vertices.
+		--Average # of vertices of ref. candidates in O6_Oceania: 	864.0 vertices.
+***************************************************
+Query Result: 30577 pairs.
+***************************************************
+
+
+------------------------------------------------------------------------------------------------------------------
+
+
+8. O5_SouthAmerica O6_SouthAmerica
+N = 16, ID set to uint
+***************************************************
+*************** APRIL configuration: **************
+-Datasets (R & S): 		O5_SouthAmerica & O6_SouthAmerica
+-Partitions: 			1
+-Compression: 			no
+-Data: 					polygon-polygon
+-Query: 				intersection join
+-Galloping: 			no
+-Granularity: 			16-16
+***************************************************
+Pipeline: 
+MBR-join -> Intermediate Filter -> Refinement Stage -> Result
+***************************************************
+
+***************************************************
+Initializing MBR-join... 
+Finished: sizes 123687 (O5_SouthAmerica) & 228208 (O6_SouthAmerica) objects in the datasets.
+***************************************************
+Creating APRIL approximation for polygon dataset O5_SouthAmerica
+  Pre-processing time: 14.7434 sec.
+Finished in 15.020737 seconds.
+***************************************************
+***************************************************
+Creating APRIL approximation for polygon dataset O6_SouthAmerica
+  Pre-processing time: 22.862376 sec.
+Finished in 23.325938 seconds.
+***************************************************
+Loading datasets' APRIL... 
+Finished.
+Evaluating query...
+Finished!
+***************************************************
+
+**********************SUMMARY**********************
+***************************************************
+Total time: 						1.564167 sec.
+	-MBR-join time: 				0.043219 sec.
+	-Intermediate Filter time: 		0.112825 sec.
+	-Refinement time: 				1.408123 sec.
+***************************************************
+Intermediate Filter Effectiveness: 
+	-Accepted: 				11.90%
+	-Rejected: 				62.31%
+	-Inconclusive: 			25.80%
+***************************************************
+Candidate Analysis: 
+	-Candidates after MBR Filter: 	110188
+	-Candidates after Refinement: 	28426
+		--Average # of vertices of ref. candidates in O5_SouthAmerica: 	978.8 vertices.
+		--Average # of vertices of ref. candidates in O6_SouthAmerica: 	180.0 vertices.
+***************************************************
+Query Result: 26939 pairs.
+***************************************************
+
+
+------------------------------------------------------------------------------------------------------------------
+
+
