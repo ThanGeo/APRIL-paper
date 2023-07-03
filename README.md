@@ -136,3 +136,5 @@ For the polygon triangulation needed for the OpenGL experiments (not included, t
 
 
 ## Copyright
+
+Full
