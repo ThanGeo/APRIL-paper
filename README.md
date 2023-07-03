@@ -1,6 +1,6 @@
 # APRIL
 
-Code for the paper with ID 127 and title **APRIL: Approximating Polygons as Raster Intervals Lists**
+Code for **APRIL: Approximating Polygons as Raster Intervals Lists**
 
 Please read the instructions in their entirety before running tests.
 
