@@ -33,7 +33,7 @@ double universalMaxY = -std::numeric_limits<double>::max();
 Dataset geometryDatasetA("A");
 Dataset geometryDatasetB("B");
 
-int HILBERT_POWER = 16;
+int HILBERT_POWER=16;
 uint HILBERT_n = pow(2,HILBERT_POWER);
 
 //the sections vector

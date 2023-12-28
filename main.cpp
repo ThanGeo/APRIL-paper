@@ -17,6 +17,20 @@ void toLowercase(char *buf){
     }
 }
 
+void saveFormattedStats(string argument1, string argument2, unsigned long long &result, double totalTime, double MBRFTime, double IFtime, double REFTime){
+    string result_filename = "experiment_data/"+argument1+"-"+argument2+"-"+to_string(HILBERT_POWER)+"_"+to_string(H)+".txt";
+    ofstream fout(result_filename, fstream::out | ios_base::binary);
+    
+    fout << accepted / (double) postMBRCandidates << ",";
+    fout << rejected / (double) postMBRCandidates << ",";
+    fout << rejected / (double) postMBRCandidates << ",";
+    fout << MBRFTime << ",";
+    fout << IFtime << ",";
+    fout << REFTime << "\n";
+    
+    fout.close();
+}
+
 void saveStats(unsigned long long &result, double totalTime, double MBRFTime, double IFtime, double REFTime){
     //print total results
     cout << "***************************************************" << endl;
@@ -87,7 +101,7 @@ int main(int argc, char **argv)
 
     
 
-    while ((c = getopt(argc, argv, "sn:fezgwld:cqp:?")) != -1)
+    while ((c = getopt(argc, argv, "sn:fezh:gwld:cqp:?")) != -1)
     {
         switch (c)
         {
@@ -133,6 +147,10 @@ int main(int argc, char **argv)
                 break;
             case 'g':
                 GALLOPING = 1;
+                break;
+            case 'h':
+                HILBERT_POWER = atoi(optarg);
+                HILBERT_n = pow(2,HILBERT_POWER);
                 break;
             default:
                 break;
@@ -310,7 +328,7 @@ int main(int argc, char **argv)
         cout << "********SUMMARY (AVERAGE OF 10 ITERATIONS)*********" << endl;
         cout << "***************************************************" << endl << endl;
         saveStats(result, MBRF/(double)totalIterations + IF/(double)totalIterations + REF/(double)totalIterations, MBRF/(double)totalIterations, IF/(double)totalIterations, REF/(double)totalIterations);
-
+        saveFormattedStats(argument1, argument2, result, MBRF/(double)totalIterations + IF/(double)totalIterations + REF/(double)totalIterations, MBRF/(double)totalIterations, IF/(double)totalIterations, REF/(double)totalIterations);
     }else{
 
         cout << "Evaluating query..." << endl;

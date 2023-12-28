@@ -66,6 +66,7 @@ extern uint DESIGNATED_ORDER;
 #define LINESTRING_TYPE 1
 extern uint DATA_TYPE;
 
+extern int HILBERT_POWER;
 extern uint HILBERT_n;
 
 // #define E 1e-08	//error margin
