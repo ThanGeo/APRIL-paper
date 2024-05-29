@@ -138,3 +138,6 @@ For the polygon triangulation needed for the OpenGL experiments (not included, t
 ## Copyright
 
 Full
+
+## Acknowledgments
+This work has been supported by the Hellenic Foundation for Research and Innovation (HFRI) under the “2nd Call for HFRI Research Projects to support Faculty Members & Researchers” (Project No. 2757)
