@@ -21,6 +21,7 @@
 #include "containers.h"
 #include "../libvbyte-master/vbyte.h"
 #include "../libvbyte-master/varintdecode.h"
+#include "intervalization.h"
 
 using namespace std;
 
@@ -29,7 +30,8 @@ extern double partial_cell_time, intervalization_time, pip_time;
 void rasterize2grid(Polygon &pol, Section &sec, int &fromPower);
 
 
-void rasterizeSimple(Polygon &pol, Section &sec);
+void rasterizeAndIntervalizeFloodFill(Polygon &pol, Section &sec);
 
 void rasterizeSimpleLinestring(Polygon &pol, Section &sec);
-void rasterizeAndIntervalizeNoFloodFill(Polygon &pol, Section &sec);
+void intervalizeOneStep(Polygon &pol, Section &sec);
+void rasterizeAndIntervalizeScanline(Polygon &pol, Section &sec);

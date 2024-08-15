@@ -25,5 +25,7 @@
 using namespace std;
 
 void intervalize(Polygon &pol);
+void printIntervals(vector<ID> &intervals);
+void createIntervalList(Polygon &pol, CellPackage &cp, int COLOR);
 
 void compressLinestringCells(Polygon &pol);

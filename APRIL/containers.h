@@ -211,7 +211,37 @@ public:
 	
 };
 
+struct Edge {
+    Point start, end;
+    double slope, intercept;
+    
+    Edge(Point s, Point e) : start(s), end(e) {
+        if (end.x != start.x) {
+            slope = (end.y - start.y) / (end.x - start.x);
+            intercept = start.y - slope * start.x;
+        } else {
+            slope = std::numeric_limits<double>::infinity(); // vertical line
+            intercept = start.x; // x-intercept
+        }
+    }
+	~Edge(){}
 
+    double getIntersectionXWithHorizontalLine(double y) const {
+        if (slope != std::numeric_limits<double>::infinity()) {
+            // non vertical
+            if (slope != 0) {
+                // slope exists
+                return ((y - intercept) / slope);
+            } else {
+                // horizontal line segment
+                return start.x;
+            }
+        } else {
+            // vertical line segment
+            return start.x;
+        }
+    }
+};
 
 class Polygon{
 public:	
@@ -221,6 +251,7 @@ public:
 	//only these are needed for RI join, the rest are cleared
 	uint recID;
 	vector<Point> vertices;
+	vector<Edge> edges;
 	polygon boostPolygon;
 	linestring boostLinestring;
 

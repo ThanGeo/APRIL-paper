@@ -52,7 +52,7 @@ void saveStats(unsigned long long &result, double totalTime, double MBRFTime, do
     cout << "\t-Candidates after MBR Filter: \t" << postMBRCandidates << endl;
     
     if(REFINEMENT){
-        cout << "\t-Candidates after Refinement: \t" << refinementCandidates << endl;
+        cout << "\t-Refinement Candidates: \t" << refinementCandidates << endl;
         cout << fixed << setprecision(1) << "\t\t--Average # of vertices of ref. candidates in " << argument1 << ": \t" << refinementCandidatesR / (double) (refinementCandidates) << " vertices." << endl;
         cout << fixed << setprecision(1) << "\t\t--Average # of vertices of ref. candidates in " << argument2 << ": \t" << refinementCandidatesS / (double) (refinementCandidates) << " vertices." << endl;
         // cout << "   Accepted AFTER refinement (as a percentage of the refinement candidates): \t" << acceptedAfterRefinement / (double) refinementCandidates * 100 << "%" << endl;

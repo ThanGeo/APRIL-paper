@@ -120,7 +120,7 @@ void computeIntervalsPolygons(string &argument, int flag){
 		timer = clock();
 		//get the intersecting sections of the polygon's MBR in the data space
 		vector<Section> sects = DATA_SPACE.getSectionsOfMBR(polxMin, polyMin, polxMax, polyMax);
-		// cout << "locate section " << (clock()-timer) / (double)(CLOCKS_PER_SEC) << endl;
+		// std::cout << "locate section " << (clock()-timer) / (double)(CLOCKS_PER_SEC) << endl;
 
 		//rasterize separately for each section (if there are more than 1 partitions, otherwise only 1 section; the entire data space)
 		for(int i = 0; i<sects.size(); i++){
@@ -134,66 +134,13 @@ void computeIntervalsPolygons(string &argument, int flag){
 
 			//combined rasterization and intervalization with no flood filling
 			timer = clock();
-			rasterizeAndIntervalizeNoFloodFill(pol, sec);
+			// printf("Rasterizing object %d with %ld vertices.\n", pol.recID, pol.vertices.size());
+			// rasterizeAndIntervalizeScanline(pol, sec);
+			// rasterizeAndIntervalizeFloodFill(pol, sec);
+			intervalizeOneStep(pol, sec);
+			// printf("Rasterized and intervalized in %f seconds.\n", (clock()-timer) / (double)(CLOCKS_PER_SEC));
 			preprocessingTime += (clock()-timer) / (double)(CLOCKS_PER_SEC);
 
-			// if(true){
-			// 	//combined rasterization and intervalization with no flood filling
-			// 	rasterizeAndIntervalizeNoFloodFill(pol, sec);
-			// }else{
-			// 	//---RASTERIZE POLYGON---
-			// 	timer = clock();
-			// 	if(DIFF_GRANULARITY_FIXED && (argument == "T3NA" || argument == "O6_Oceania")){
-			// 		//---rasterize to fixed granularity (using the simple method, since granularity is lower than 16)---
-			// 		//have defined specific order for all polygons of this dataset
-			// 		pol.orderN = DESIGNATED_ORDER;
-			// 		//simple rasterization
-			// 		rasterizeSimple(pol, sec);
-			// 	}else{
-			// 		//---calculate the value of K (described in paper)---
-			// 		// number of cells in the order 16 grid that are intersected by the object's MBR
-			// 		C = MBRarea / sec.cellArea;
-			// 		if(C <= 1500){
-			// 			// cout << "formula1 fixed: 16 " << endl;
-			// 		}else{
-			// 			K = 16 - ceil(log2(MBRarea / (sec.cellArea * (double) 1500)) / 2);
-			// 		}
-			// 		//dont let it go under 8 (no point)
-			// 		K = max(8,K);
-			// 		//---Decide whether to rasterize using the simple or 2-grid algorithm---
-			// 		if(K > 11){
-			// 			//rasterize using the simple algorithm					
-			// 			rasterizeSimple(pol, sec);
-			// 		}else{					
-			// 			//rasterize using the 2-grid rasterization algorithm
-			// 			rasterize2grid(pol, sec, K);
-			// 		}
-
-			// 	}
-			// 	rasterizationTime += (clock()-timer) / (double)(CLOCKS_PER_SEC);
-
-			// 	//---INTERVALIZE POLYGON---
-			// 	timer = clock();
-			// 	intervalize(pol);
-			// 	// cout << fixed << setprecision(14) << "Intervalization time: " << (clock()-timer) / (double)(CLOCKS_PER_SEC) << " seconds." << endl;
-			// 	intervalizationTime += (clock()-timer) / (double)(CLOCKS_PER_SEC);
-
-			// 	// cout << "ALL and F intervals total: " << pol.uncompressedALL.size()/2 << " and " << pol.uncompressedF.size()/2 << endl;
-			// 	// //print partial
-			// 	// cout << "PARTIAL" << endl;
-			// 	// for(auto it = pol.uncompressedALL.begin(); it != pol.uncompressedALL.end(); it+=2){		
-			// 	// 	cout << "[" << *it << "," << *(it+1) << ")" << endl;
-			// 	// }
-			// 	// //print full
-			// 	// cout << "FULL" << endl;
-			// 	// for(auto it = pol.uncompressedF.begin(); it != pol.uncompressedF.end(); it+=2){		
-			// 	// 	cout << "[" << *it << "," << *(it+1) << ")" << endl;
-			// 	// }
-
-			// 	// exit(0);
-
-			// }
-			
 			//---SAVE ON DISK---
 			switch(COMPRESSION){
 				case 0:
@@ -203,23 +150,25 @@ void computeIntervalsPolygons(string &argument, int flag){
 					saveBinaryIntervalsCompressed(pol, sec.sectionID, foutALL, foutF);
 					break;
 			}		
+
+
 		}
 
 
 		lineCounter++;
 	}
 
-	// cout << "  Rasterization time: " << rasterizationTime << " sec." << endl;
-	// cout << "  Intervalization time: " << intervalizationTime << " sec." << endl;
+	// std::cout << "  Rasterization time: " << rasterizationTime << " sec." << endl;
+	// std::cout << "  Intervalization time: " << intervalizationTime << " sec." << endl;
 
-	// cout << "Pip tests per polygon: " << (double) total_pip_tests / totalPolygonCount << endl;
-	// cout << "	partial cells time: " << partial_cell_time << " sec." << endl;
-	// cout << "	intervalization time: " << intervalization_time << " sec." << endl;
-	// cout << "		pip time: " << pip_time << " seconds." << endl;
+	// std::cout << "Pip tests per polygon: " << (double) total_pip_tests / totalPolygonCount << endl;
+	// std::cout << "	partial cells time: " << partial_cell_time << " sec." << endl;
+	// std::cout << "	intervalization time: " << intervalization_time << " sec." << endl;
+	// std::cout << "		pip time: " << pip_time << " seconds." << endl;
 
 
 
-	cout << "  Pre-processing time: " << preprocessingTime << " sec." << endl;
+	std::cout << "  Pre-processing time: " << preprocessingTime << " sec." << std::endl;
 
 	fin.close();
 	foutALL.close();
@@ -344,8 +293,8 @@ void computeIntervalsLinestrings(string &argument, int flag){
 		lineCounter++;
 	}
 
-	cout << "  Rasterization time: " << rasterizationTime << endl;
-	cout << "  Intervalization time: " << intervalizationTime << " seconds." << endl;
+	std::cout << "  Rasterization time: " << rasterizationTime << endl;
+	std::cout << "  Intervalization time: " << intervalizationTime << " seconds." << endl;
 
 	fin.close();
 	foutALL.close();
@@ -365,22 +314,22 @@ void computeIntervalsLinestrings(string &argument, int flag){
 void createApproximations(string argument, int flag){
 	if(flag == 0 || DATA_TYPE == POLYGON_TYPE){
 		//polygons
-		cout << "***************************************************" << endl;
-		cout << "Creating APRIL approximation for polygon dataset " << argument << endl;
+		std::cout << "***************************************************" << endl;
+		std::cout << "Creating APRIL approximation for polygon dataset " << argument << endl;
 		clock_t timer;
 		timer = clock();
 		computeIntervalsPolygons(argument, flag);
-		cout << fixed << setprecision(6) << "Finished in " << (clock()-timer) / (double)(CLOCKS_PER_SEC) << " seconds." << endl;
-		cout << "***************************************************" << endl;
+		std::cout << fixed << setprecision(6) << "Finished in " << (clock()-timer) / (double)(CLOCKS_PER_SEC) << " seconds." << endl;
+		std::cout << "***************************************************" << endl;
 	}else if(flag == 1 && DATA_TYPE == LINESTRING_TYPE){
 		//linestrings
-		cout << "***************************************************" << endl;
-		cout << "Creating APRIL approximation for linestring dataset " << argument << endl;
+		std::cout << "***************************************************" << endl;
+		std::cout << "Creating APRIL approximation for linestring dataset " << argument << endl;
 		clock_t timer;
 		timer = clock();
 		computeIntervalsLinestrings(argument, flag);
-		cout << fixed << setprecision(6) << "Finished in " << (clock()-timer) / (double)(CLOCKS_PER_SEC) << " seconds." << endl;
-		cout << "***************************************************" << endl;
+		std::cout << fixed << setprecision(6) << "Finished in " << (clock()-timer) / (double)(CLOCKS_PER_SEC) << " seconds." << endl;
+		std::cout << "***************************************************" << endl;
 	}	
 }
 
@@ -388,7 +337,7 @@ void loadApproximations(Dataset &dataset, string argument, int flag){
 	clock_t timer;
 	timer = clock();
 	//  load data
-	// cout << "Loading Raster Intervals for " << argument << "..." << endl;
+	// std::cout << "Loading Raster Intervals for " << argument << "..." << endl;
 	switch(COMPRESSION){
 		case 0:
 			loadAprilUncompressed(dataset, argument, flag);
@@ -397,5 +346,5 @@ void loadApproximations(Dataset &dataset, string argument, int flag){
 			loadAprilCompressed(dataset, argument, flag);
 			break;
 	}
-	// cout << fixed << setprecision(6) << "Finished in " << (clock()-timer) / (double)(CLOCKS_PER_SEC) << " seconds" << endl;		
+	// std::cout << fixed << setprecision(6) << "Finished in " << (clock()-timer) / (double)(CLOCKS_PER_SEC) << " seconds" << endl;		
 }

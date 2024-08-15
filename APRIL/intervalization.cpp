@@ -4,6 +4,10 @@ uint32_t container[1000000];
 uint8_t output[10000000];
 
 void printIntervals(vector<ID> &intervals){
+	if (intervals.size() == 0) {
+		cout << endl;
+		return;
+	}
 	cout << "INTERVALS: " << endl;
 	for(auto it = intervals.begin(); it <= intervals.end()-1; it+=2){
 		cout << *it << "," << *(it + 1) << endl;

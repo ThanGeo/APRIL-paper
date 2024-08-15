@@ -135,12 +135,12 @@ void mapLinestringCustom(Polygon &pol, uint orderN, Section &sec){
 
 void mapPolygonCustom(Polygon &pol, uint orderN, Section &sec){
 	//first, map the polygon's coordinates to this section's hilbert space
-	for(auto &p: pol.vertices){
+	for(auto &p : pol.vertices) {
 		normalizeXYToSectionHilbert(p.x, p.y, sec.rasterxMin, sec.rasteryMin, sec.rasterxMax, sec.rasteryMax, orderN);
 		pol.boostPolygon.outer().emplace_back(p.x, p.y);
 	}
 	boost::geometry::correct(pol.boostPolygon);	
-	//map the mbr
+	// get the hilbert cells min/max
 	pol.minHilbertX = normalizeSingleValueToSectionHilbert(pol.mbr.pMin.x, sec.rasterxMin, sec.rasterxMax, orderN);
 	pol.minHilbertX > 0 ? pol.minHilbertX -= 1 : pol.minHilbertX = 0;
 	pol.minHilbertY = normalizeSingleValueToSectionHilbert(pol.mbr.pMin.y, sec.rasteryMin, sec.rasteryMax, orderN);
@@ -149,8 +149,52 @@ void mapPolygonCustom(Polygon &pol, uint orderN, Section &sec){
 	pol.maxHilbertX < orderN - 1 ? pol.maxHilbertX += 1 : pol.maxHilbertX = orderN - 1;
 	pol.maxHilbertY = normalizeSingleValueToSectionHilbert(pol.mbr.pMax.y, sec.rasteryMin, sec.rasteryMax, orderN);
 	pol.maxHilbertY < orderN - 1 ? pol.maxHilbertY += 1 : pol.maxHilbertY = orderN - 1;
+	//set dimensions for buffers (matrices)
+	pol.bufferWidth = pol.maxHilbertX - pol.minHilbertX + 1;
+	pol.bufferHeight = pol.maxHilbertY - pol.minHilbertY + 1;
+}
 
-	// //set dimensions for buffers (matrices)
+void mapPolygonOnestep(Polygon &pol, uint orderN, Section &sec){
+	//first, map the polygon's coordinates to this section's hilbert space
+	for(auto &p : pol.vertices) {
+		normalizeXYToSectionHilbert(p.x, p.y, sec.rasterxMin, sec.rasteryMin, sec.rasterxMax, sec.rasteryMax, orderN);
+		pol.boostPolygon.outer().emplace_back(p.x, p.y);
+	}
+	boost::geometry::correct(pol.boostPolygon);	
+	// map mbr
+	normalizeXYToSectionHilbert(pol.mbr.pMin.x, pol.mbr.pMin.y, sec.rasterxMin, sec.rasteryMin, sec.rasterxMax, sec.rasteryMax, orderN);
+	normalizeXYToSectionHilbert(pol.mbr.pMax.x, pol.mbr.pMax.y, sec.rasterxMin, sec.rasteryMin, sec.rasterxMax, sec.rasteryMax, orderN);
+	// get the hilbert cells min/max
+	pol.minHilbertX = (uint) pol.mbr.pMin.x;
+	pol.minHilbertY = (uint) pol.mbr.pMin.y;
+	pol.maxHilbertX = (uint) pol.mbr.pMax.x;
+	pol.maxHilbertY = (uint) pol.mbr.pMax.y;
+	//set dimensions for buffers (matrices)
+	pol.bufferWidth = pol.maxHilbertX - pol.minHilbertX + 1;
+	pol.bufferHeight = pol.maxHilbertY - pol.minHilbertY + 1;
+}
+
+void mapPolygonScanline(Polygon &pol, uint orderN, Section &sec){
+	//first, map the polygon's coordinates to this section's hilbert space
+	for(auto &p: pol.vertices){
+		normalizeXYToSectionHilbert(p.x, p.y, sec.rasterxMin, sec.rasteryMin, sec.rasterxMax, sec.rasteryMax, orderN);
+		pol.boostPolygon.outer().emplace_back(p.x, p.y);
+	}
+	boost::geometry::correct(pol.boostPolygon);	
+	// add the edges
+	pol.edges.reserve(pol.vertices.size());
+	for(int i=0; i<pol.vertices.size()-1; i++){
+		pol.edges.emplace_back(Edge(pol.vertices[i], pol.vertices[i+1]));
+	}
+	// map mbr
+	normalizeXYToSectionHilbert(pol.mbr.pMin.x, pol.mbr.pMin.y, sec.rasterxMin, sec.rasteryMin, sec.rasterxMax, sec.rasteryMax, orderN);
+	normalizeXYToSectionHilbert(pol.mbr.pMax.x, pol.mbr.pMax.y, sec.rasterxMin, sec.rasteryMin, sec.rasterxMax, sec.rasteryMax, orderN);
+	// get the hilbert cells min/max
+	pol.minHilbertX = (uint) pol.mbr.pMin.x;
+	pol.minHilbertY = (uint) pol.mbr.pMin.y;
+	pol.maxHilbertX = (uint) pol.mbr.pMax.x;
+	pol.maxHilbertY = (uint) pol.mbr.pMax.y;
+	//set dimensions for buffers (matrices)
 	pol.bufferWidth = pol.maxHilbertX - pol.minHilbertX + 1;
 	pol.bufferHeight = pol.maxHilbertY - pol.minHilbertY + 1;
 }
@@ -552,8 +596,9 @@ void fillAndFinalizeMatrix(Polygon &pol, uint **M){
 					floodFillUncertainSpecific(M, i, j, pol.bufferWidth, pol.bufferHeight, pol, EMPTY_COLOR);
 				}
 			}else if(M[i][j] == PARTIAL_COLOR){			
-				//store into preallocated array
 				pol.partialCellPackage.addID(xy2d(HILBERT_n, i + pol.minHilbertX, j + pol.minHilbertY));
+			} else if(M[i][j] == PARTIAL_COLOR){
+				pol.fullCellPackage.addID(xy2d(HILBERT_n, i + pol.minHilbertX, j + pol.minHilbertY));
 			}
 		}
 
@@ -1074,7 +1119,7 @@ void rasterizeSimpleLinestring(Polygon &pol, Section &sec){
 
 
 
-void rasterizeSimple(Polygon &pol, Section &sec){
+void rasterizeAndIntervalizeFloodFill(Polygon &pol, Section &sec){
 	ID x,y;
 	clock_t timer;
 	timer = clock();
@@ -1083,33 +1128,37 @@ void rasterizeSimple(Polygon &pol, Section &sec){
 	mapPolygonCustom(pol, HILBERT_n, sec);
 
 	// //print mapped polygon
-	// for(auto &it: pol.vertices){
-	// 	cout << fixed << setprecision(10) << "(" << it.x << "," << it.y << ")" << endl;
+	// for (auto &it : pol.vertices) {
+	// 	printf("(%f,%f),", it.x, it.y);
 	// }
-	// cout << endl << endl;
+	// printf("\n");
 
-	//allocate enough space for the cells
-	pol.partialCellPackage.hilbertCellIDs.reserve(pol.bufferWidth * pol.bufferHeight);
-	pol.fullCellPackage.hilbertCellIDs.reserve(pol.bufferWidth * pol.bufferHeight);
 
 	//---------METHOD WITHOUT CLUSTER CLEAN - NEEDS HIGH GRANULARITY AND MANY PARTITIONS TO WORK WELL--------
 	/* PARTIAL CELLS */
 	//grid traversal algorithm - create partially covered cell matrix
 	uint **M = calculatePartialAndUncertain(pol, HILBERT_n);	
 	// printMatrix(M, pol.bufferWidth, pol.bufferHeight);
-
+	//allocate enough space for the cells
+	pol.partialCellPackage.hilbertCellIDs.reserve(pol.bufferWidth * pol.bufferHeight);
+	pol.fullCellPackage.hilbertCellIDs.reserve(pol.bufferWidth * pol.bufferHeight);
 
 	/* FULL CELLS */
 	//flood fill algorithm
 	fillAndFinalizeMatrix(pol, M);
 	// printMatrix(M, pol.bufferWidth, pol.bufferHeight);
 
+	// intervalize 
+	createIntervalList(pol, pol.fullCellPackage, FULL_COLOR);
+	// add all FULL cells into the partial cell package to create the ALL list
+	pol.partialCellPackage.hilbertCellIDs.insert(end(pol.partialCellPackage.hilbertCellIDs), begin(pol.fullCellPackage.hilbertCellIDs), end(pol.fullCellPackage.hilbertCellIDs));
+	createIntervalList(pol, pol.partialCellPackage, PARTIAL_COLOR);
+
 	// DON'T FORGET TO DELETE THE MATRIX BEFORE RETURNING!
 	for(size_t i = 0; i < pol.bufferWidth; i++){
 		delete M[i];
 	}
 	delete M;
-
 	//print partial
 	// cout << "PARTIAL" << endl;
 	// for(auto &it: pol.partialCellPackage.hilbertCellIDs){
@@ -1424,23 +1473,32 @@ void computeIntervalsNoFloodFillEnhanced(Polygon &pol){
 	pol.uncompressedF = fullIntervals;
 }
 
-void rasterizeAndIntervalizeNoFloodFill(Polygon &pol, Section &sec){
-
+void intervalizeOneStep(Polygon &pol, Section &sec){
 	ID x,y;
 	clock_t timer;
 
+	// print original polygon
+	// for(auto &it: pol.vertices) {
+	// 	printf("(%f,%f),", it.x, it.y);
+	// }
+	// printf("\n");
+
 	//first of all map the polygon's coordinates to this section's hilbert space
-	mapPolygonCustom(pol, HILBERT_n, sec);
+	mapPolygonOnestep(pol, HILBERT_n, sec);
 
 	//print mapped polygon
-	// for(auto &it: pol.vertices){
-	// 	cout << fixed << setprecision(10) << "(" << it.x << "," << it.y << ")" << endl;
+	// for(auto &it: pol.vertices) {
+	// 	printf("(%f,%f),", it.x, it.y);
 	// }
-	// cout << endl << endl;
+	// printf("\n");
 
 	// timer = clock();
+	// printf("MBR: (%f,%f),(%f,%f)\n", pol.mbr.pMin.x, pol.mbr.pMin.y, pol.mbr.pMax.x, pol.mbr.pMax.y);
+	// printf("Buffer width: %d\n", pol.bufferWidth);
+	// printf("Buffer height: %d\n", pol.bufferHeight);
 
 	//compute partial cells
+	// cout << "calculatng partials..." << endl;
 	uint **M = calculatePartialAndUncertain(pol, HILBERT_n);
 	pol.partialCellPackage.hilbertCellIDs = getPartialCellsFromMatrix(pol, M);
 	//sort the IDs 
@@ -1458,6 +1516,7 @@ void rasterizeAndIntervalizeNoFloodFill(Polygon &pol, Section &sec){
 	// timer = clock();
 	//compute all/full intervals
 	// computeIntervalsNoFloodFill(pol);
+	// cout << "INTERVALS" << endl;
 	computeIntervalsNoFloodFillEnhanced(pol);
 
 	// intervalization_time += (clock()-timer) / (double)(CLOCKS_PER_SEC);
@@ -1488,5 +1547,178 @@ void rasterizeAndIntervalizeNoFloodFill(Polygon &pol, Section &sec){
 
 
 
+	// DON'T FORGET TO DELETE THE MATRIX BEFORE RETURNING!
+	for(size_t i = 0; i < pol.bufferWidth; i++){
+		delete M[i];
+	}
+	delete M;
 	// exit(0);
+}
+
+bool pointInPolygon(const Point& p, const std::vector<Point>& vertices) {
+    int count = 0;
+    for (size_t i = 0; i < vertices.size(); ++i) {
+        Point p1 = vertices[i];
+        Point p2 = vertices[(i + 1) % vertices.size()];
+        if (p.y > std::min(p1.y, p2.y) && p.y <= std::max(p1.y, p2.y) && p.x <= std::max(p1.x, p2.x)) {
+            if (p1.y != p2.y) {
+                double xInters = (p.y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x;
+                if (p1.x == p2.x || p.x <= xInters) {
+                    count++;
+                }
+            }
+        }
+    }
+    return count % 2 != 0;
+}
+
+bool boxIntersectPolygon(const Point& bottomLeft, const Point& topRight, const polygon &boostPolygon) {
+    polygon cell;
+	cell.outer().emplace_back(bottomLeft.x, bottomLeft.y);
+	cell.outer().emplace_back(topRight.x, bottomLeft.y);
+	cell.outer().emplace_back(topRight.x, topRight.y);
+	cell.outer().emplace_back(bottomLeft.x, topRight.y);
+	boost::geometry::correct(cell);
+
+	return boost::geometry::intersects(cell, boostPolygon);
+}
+
+void rasterizeAndIntervalizeScanline(Polygon &pol, Section &sec) {
+	ID x,y;
+	clock_t timer;
+	
+	//first of all map the polygon's coordinates to this section's hilbert space
+	mapPolygonScanline(pol, HILBERT_n, sec);
+
+	// printf("Buffer width = %d, buffer height = %d\n", pol.bufferWidth, pol.bufferHeight);
+	// for (auto &it : pol.vertices) {
+	// 	printf("(%f,%f),", it.x, it.y);
+	// }
+	// printf("\n");
+
+	// initialize local grid
+	uint **M = new uint*[pol.bufferWidth]();
+	for(uint i=0; i<pol.bufferWidth; i++){
+		M[i] = new uint[pol.bufferHeight]();		
+		for(uint j=0; j<pol.bufferHeight; j++){
+			M[i][j] = EMPTY_COLOR;
+		}
+	}
+	// printf("Scanline...\n");
+
+	double gridWidth = pol.mbr.pMax.x - pol.mbr.pMin.x;
+    double gridHeight = pol.mbr.pMax.y - pol.mbr.pMin.y;
+	uint yScanline = (uint) pol.mbr.pMin.y;
+    uint nextYScanline = yScanline + 1;
+	for (int j = 0; j < pol.bufferHeight+1; ++j) {
+		// printf("Scanline: %d\n", yScanline);
+		// printf("Next scanline: %d\n", nextYScanline);
+		std::vector<double> xIntersections;
+		// loop edges
+		for (const auto& edge : pol.edges) {
+			double edgeYmin = std::min(edge.start.y, edge.end.y);
+            double edgeYmax = std::max(edge.start.y, edge.end.y);
+			// printf("Edge: (%f,%f),(%f,%f)\n", edge.start.x, edge.start.y, edge.end.x, edge.end.y);
+			// modified scanline rendering (perfect accuracy)
+			if (edgeYmax < yScanline || edgeYmin > nextYScanline) {
+                continue;
+            } else if (yScanline >= edgeYmin && yScanline <= edgeYmax) {
+                double xInter = edge.getIntersectionXWithHorizontalLine(yScanline);
+                xIntersections.push_back(xInter);
+            } 
+			// the code below adds accuracy at the cost of performance
+			double xStart = std::min(edge.start.x, edge.end.x);
+			double xEnd = std::max(edge.start.x, edge.end.x);
+			uint xStartIdx = std::max((uint)0, uint(xStart - pol.minHilbertX));
+			uint xEndIdx = std::min(pol.bufferWidth - 1, uint(xEnd - pol.minHilbertX));
+			for (int i = xStartIdx; i <= xEndIdx; ++i) {
+				Point cellBottomLeft = {i + pol.minHilbertX, j + pol.minHilbertY};
+				Point cellTopRight = {i + 1 + pol.minHilbertX, j + 1 + pol.minHilbertY};
+				if (boxIntersectPolygon(cellBottomLeft, cellTopRight, pol.boostPolygon)) {
+					M[i][j] = PARTIAL_COLOR;
+				}
+			}	
+		}
+		// sort intersections on X
+		std::sort(xIntersections.begin(), xIntersections.end());
+
+		// for (auto &it : xIntersections) {
+		// 	printf("(%f,%u),", it, yScanline);
+		// }
+		// printf("\n");
+
+        // Fill grid cells
+        for (size_t k = 0; k + 1 < xIntersections.size(); k += 2) {
+            double xStart = xIntersections[k];
+            double xEnd = xIntersections[k + 1];
+            uint xStartIdx = std::max((uint) 0, uint(xStart - pol.minHilbertX));
+            uint xEndIdx = std::min(pol.bufferWidth - 1, uint(xEnd - pol.minHilbertX));
+
+			// printf("From (%f,%u) to (%f,%u): indices %u to %u\n", xStart, yScanline, xEnd, yScanline,xStartIdx, xEndIdx);
+            for (int i = xStartIdx; i <= xEndIdx; ++i) {
+                Point cellBottomLeft = {i + pol.minHilbertX, j + pol.minHilbertY};
+                Point cellBottomRight = {i + 1 + pol.minHilbertX, j + pol.minHilbertY};
+                Point cellTopRight = {i + 1 + pol.minHilbertX, j + 1 + pol.minHilbertY};
+                Point cellTopLeft = {i + pol.minHilbertX, j + 1 + pol.minHilbertY};
+                
+                if (!(pointInPolygon(cellBottomLeft, pol.vertices)) || 
+                    !(pointInPolygon(cellBottomRight, pol.vertices)) || 
+                    !(pointInPolygon(cellTopLeft, pol.vertices)) || 
+                    !(pointInPolygon(cellTopRight, pol.vertices))) {
+						M[i][j] = PARTIAL_COLOR;
+						// printf("2. Partial at (%d,%d)\n", i+pol.minHilbertX, j+pol.minHilbertY);
+                } else {
+					M[i][j] = FULL_COLOR;
+					// printf("Full at (%d,%d)\n", i+pol.minHilbertX, j+pol.minHilbertY);
+                }
+            }
+        }
+		// move scan lines
+		yScanline++;
+    	nextYScanline++;
+	}
+	// // print matrix
+	// for(int j=pol.bufferHeight-1; j>=0; j--){
+	// 	for(int i=0; i<pol.bufferWidth; i++){	
+	// 		printf("%d ", M[i][j]);
+	// 	}
+	// 	printf("\n");
+	// }
+	// printf("\n");
+
+	// for(int j=0; j<pol.bufferHeight; j++){
+	// 	for(int i=0; i<pol.bufferWidth; i++){
+	// 		if(M[i][j] == PARTIAL_COLOR){
+	// 			printf("(%u,%u),", i + pol.minHilbertX, j + pol.minHilbertY);
+	// 		} else if (M[i][j] == FULL_COLOR) {
+	// 			// printf("(%u,%u),", i + pol.minHilbertX, j + pol.minHilbertY);
+	// 		}
+	// 	}
+	// } 
+	// printf("\n");
+	// printf("Creating cell lists...\n");
+
+	//allocate enough space for the cells
+	pol.partialCellPackage.hilbertCellIDs.reserve(pol.bufferWidth * pol.bufferHeight);
+	pol.fullCellPackage.hilbertCellIDs.reserve(pol.bufferWidth * pol.bufferHeight);
+	// create the cell lists
+	for(int i=0; i<pol.bufferWidth; i++){
+		for(int j=0; j<pol.bufferHeight; j++){
+			if(M[i][j] == PARTIAL_COLOR){
+				pol.partialCellPackage.hilbertCellIDs.emplace_back(xy2d(HILBERT_n, i + pol.minHilbertX, j + pol.minHilbertY));
+			} else if (M[i][j] == FULL_COLOR) {
+				pol.fullCellPackage.hilbertCellIDs.emplace_back(xy2d(HILBERT_n, i + pol.minHilbertX, j + pol.minHilbertY));
+			}
+		}
+	}
+	// intervalize 
+	createIntervalList(pol, pol.fullCellPackage, FULL_COLOR);
+	// add all FULL cells into the partial cell package to create the ALL list
+	pol.partialCellPackage.hilbertCellIDs.insert(end(pol.partialCellPackage.hilbertCellIDs), begin(pol.fullCellPackage.hilbertCellIDs), end(pol.fullCellPackage.hilbertCellIDs));
+	createIntervalList(pol, pol.partialCellPackage, PARTIAL_COLOR);
+	// DON'T FORGET TO DELETE THE MATRIX BEFORE RETURNING!
+	for(size_t i = 0; i < pol.bufferWidth; i++){
+		delete M[i];
+	}
+	delete M;
 } 
