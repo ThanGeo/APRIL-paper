@@ -204,7 +204,6 @@ int main(int argc, char **argv)
 
 
     cout << "***************************************************" << endl;
-    cout << "Initializing MBR-join... " << endl;
     // Load inputs (creates MBRs from geometry files)
     #pragma omp parallel sections
     {
@@ -217,7 +216,7 @@ int main(int argc, char **argv)
             S.load(getBinaryGeometryFilename(1));
         }
     }
-    cout << "Finished: sizes ";
+    cout << "Dataset sizes ";
     cout << R.size() << " (" << argument1 << ") & " << S.size() << " (" << argument2 << ") objects in the datasets." << endl;
 
     //fix the relation data space to be the same as our Hilbert data space
