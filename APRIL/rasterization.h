@@ -29,9 +29,11 @@ extern double partial_cell_time, intervalization_time, pip_time;
 
 void rasterize2grid(Polygon &pol, Section &sec, int &fromPower);
 
+void normalizeXYToSectionHilbert(double &x, double &y, double minX, double minY, double maxX, double maxY, uint &orderN);
 
 void rasterizeAndIntervalizeFloodFill(Polygon &pol, Section &sec);
 
+void rasterizeAndIntervalizeHybridDDAScanline(Polygon &pol, Section &sec);
 void rasterizeSimpleLinestring(Polygon &pol, Section &sec);
 void intervalizeOneStep(Polygon &pol, Section &sec);
 void rasterizeAndIntervalizeScanline(Polygon &pol, Section &sec);

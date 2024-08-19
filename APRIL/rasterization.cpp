@@ -1509,8 +1509,9 @@ void intervalizeOneStep(Polygon &pol, Section &sec){
 	// cout << "PARTIAL" << endl;
 	// for(auto &it : pol.partialCellPackage.hilbertCellIDs){		
 	// 	d2xy(HILBERT_n, it, x, y);
-	// 	cout << "(" << x << "," << y << ")" << endl;	
+	// 	printf("(%u,%u),", x, y);	
 	// }
+	// printf("\n");
 
 
 	// timer = clock();
@@ -1590,11 +1591,11 @@ void rasterizeAndIntervalizeScanline(Polygon &pol, Section &sec) {
 	//first of all map the polygon's coordinates to this section's hilbert space
 	mapPolygonScanline(pol, HILBERT_n, sec);
 
-	// printf("Buffer width = %d, buffer height = %d\n", pol.bufferWidth, pol.bufferHeight);
-	// for (auto &it : pol.vertices) {
-	// 	printf("(%f,%f),", it.x, it.y);
-	// }
-	// printf("\n");
+	printf("Buffer width = %d, buffer height = %d\n", pol.bufferWidth, pol.bufferHeight);
+	for (auto &it : pol.vertices) {
+		printf("(%f,%f),", it.x, it.y);
+	}
+	printf("\n");
 
 	// initialize local grid
 	uint **M = new uint*[pol.bufferWidth]();
@@ -1604,10 +1605,7 @@ void rasterizeAndIntervalizeScanline(Polygon &pol, Section &sec) {
 			M[i][j] = EMPTY_COLOR;
 		}
 	}
-	// printf("Scanline...\n");
 
-	double gridWidth = pol.mbr.pMax.x - pol.mbr.pMin.x;
-    double gridHeight = pol.mbr.pMax.y - pol.mbr.pMin.y;
 	uint yScanline = (uint) pol.mbr.pMin.y;
     uint nextYScanline = yScanline + 1;
 	for (int j = 0; j < pol.bufferHeight+1; ++j) {
@@ -1671,6 +1669,7 @@ void rasterizeAndIntervalizeScanline(Polygon &pol, Section &sec) {
 					M[i][j] = FULL_COLOR;
 					// printf("Full at (%d,%d)\n", i+pol.minHilbertX, j+pol.minHilbertY);
                 }
+
             }
         }
 		// move scan lines
@@ -1678,6 +1677,108 @@ void rasterizeAndIntervalizeScanline(Polygon &pol, Section &sec) {
     	nextYScanline++;
 	}
 	// // print matrix
+	// for(int j=pol.bufferHeight-1; j>=0; j--){
+	// 	for(int i=0; i<pol.bufferWidth; i++){	
+	// 		printf("%d ", M[i][j]);
+	// 	}
+	// 	printf("\n");
+	// }
+	// printf("\n");
+
+	for(int j=0; j<pol.bufferHeight; j++){
+		for(int i=0; i<pol.bufferWidth; i++){
+			if(M[i][j] == PARTIAL_COLOR){
+				printf("(%u,%u),", i + pol.minHilbertX, j + pol.minHilbertY);
+			} else if (M[i][j] == FULL_COLOR) {
+				// printf("(%u,%u),", i + pol.minHilbertX, j + pol.minHilbertY);
+			}
+		}
+	} 
+	printf("\n");
+
+	//allocate enough space for the cells
+	pol.partialCellPackage.hilbertCellIDs.reserve(pol.bufferWidth * pol.bufferHeight);
+	pol.fullCellPackage.hilbertCellIDs.reserve(pol.bufferWidth * pol.bufferHeight);
+	// create the cell lists
+	for(int i=0; i<pol.bufferWidth; i++){
+		for(int j=0; j<pol.bufferHeight; j++){
+			if(M[i][j] == PARTIAL_COLOR){
+				pol.partialCellPackage.hilbertCellIDs.emplace_back(xy2d(HILBERT_n, i + pol.minHilbertX, j + pol.minHilbertY));
+			} else if (M[i][j] == FULL_COLOR) {
+				pol.fullCellPackage.hilbertCellIDs.emplace_back(xy2d(HILBERT_n, i + pol.minHilbertX, j + pol.minHilbertY));
+			}
+		}
+	}
+	// intervalize 
+	createIntervalList(pol, pol.fullCellPackage, FULL_COLOR);
+	// add all FULL cells into the partial cell package to create the ALL list
+	pol.partialCellPackage.hilbertCellIDs.insert(end(pol.partialCellPackage.hilbertCellIDs), begin(pol.fullCellPackage.hilbertCellIDs), end(pol.fullCellPackage.hilbertCellIDs));
+	createIntervalList(pol, pol.partialCellPackage, PARTIAL_COLOR);
+	// DON'T FORGET TO DELETE THE MATRIX BEFORE RETURNING!
+	for(size_t i = 0; i < pol.bufferWidth; i++){
+		delete M[i];
+	}
+	delete M;
+} 
+
+
+void rasterizeAndIntervalizeHybridDDAScanline(Polygon &pol, Section &sec) {
+	ID x,y;
+	clock_t timer;
+	
+	//first of all map the polygon's coordinates to this section's hilbert space
+	mapPolygonScanline(pol, HILBERT_n, sec);
+
+	// printf("Buffer width = %d, buffer height = %d\n", pol.bufferWidth, pol.bufferHeight);
+	// for (auto &it : pol.vertices) {
+	// 	printf("(%f,%f),", it.x, it.y);
+	// }
+	// printf("\n");
+
+	//compute partial cells using DDA
+	uint **M = calculatePartialAndUncertain(pol, HILBERT_n);
+
+	// fill the polygon using scanline 
+	uint yScanline = pol.minHilbertY;
+    uint nextYScanline = yScanline + 1;
+	for (int j = 0; j < pol.bufferHeight+1; ++j) {
+		// printf("Scanline: %d\n", yScanline);
+		// printf("Next scanline: %d\n", nextYScanline);
+		std::vector<double> xIntersections;
+		// loop edges
+		for (const auto& edge : pol.edges) {
+			double edgeYmin = std::min(edge.start.y, edge.end.y);
+            double edgeYmax = std::max(edge.start.y, edge.end.y);
+			// printf("Edge: (%f,%f),(%f,%f)\n", edge.start.x, edge.start.y, edge.end.x, edge.end.y);
+			// modified scanline rendering (perfect accuracy)
+			if (edgeYmax < yScanline || edgeYmin > nextYScanline) {
+                continue;
+            } else if (yScanline >= edgeYmin && yScanline <= edgeYmax) {
+                double xInter = edge.getIntersectionXWithHorizontalLine(yScanline);
+                xIntersections.push_back(xInter);
+            } 
+		}
+		// sort intersections on X
+		std::sort(xIntersections.begin(), xIntersections.end());
+
+        // Fill grid cells
+        for (size_t k = 0; k + 1 < xIntersections.size(); k += 2) {
+            double xStart = xIntersections[k];
+            double xEnd = xIntersections[k + 1];
+            uint xStartIdx = std::max((uint) 0, uint(xStart - pol.minHilbertX));
+            uint xEndIdx = std::min(pol.bufferWidth - 1, uint(xEnd - pol.minHilbertX));
+			// printf("From (%f,%u) to (%f,%u): indices %u to %u\n", xStart, yScanline, xEnd, yScanline,xStartIdx, xEndIdx);
+            for (int i = xStartIdx+1; i < xEndIdx; ++i) {
+				if (M[i][j] != PARTIAL_COLOR) {
+					M[i][j] = FULL_COLOR;
+				}
+            }
+        }
+		// move scan lines
+		yScanline++;
+    	nextYScanline++;
+	}
+	// print matrix
 	// for(int j=pol.bufferHeight-1; j>=0; j--){
 	// 	for(int i=0; i<pol.bufferWidth; i++){	
 	// 		printf("%d ", M[i][j]);
@@ -1696,7 +1797,6 @@ void rasterizeAndIntervalizeScanline(Polygon &pol, Section &sec) {
 	// 	}
 	// } 
 	// printf("\n");
-	// printf("Creating cell lists...\n");
 
 	//allocate enough space for the cells
 	pol.partialCellPackage.hilbertCellIDs.reserve(pol.bufferWidth * pol.bufferHeight);

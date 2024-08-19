@@ -82,6 +82,11 @@ void computeIntervalsPolygons(string &argument, int flag){
 	foutALL.write((char*)&DATA_SPACE.totalObjects, sizeof(uint));
 	foutF.write((char*)&DATA_SPACE.totalObjects, sizeof(uint));
 
+	// size_t pixelBits = 0;
+	// size_t intervalBits = 0;
+	// size_t MBRbits = 0;
+	// size_t indicesBits = 0;
+
 	//---BUILD POLYGON LOOP---
 	while(lineCounter < totalPolygonCount){
 		//read pol id
@@ -132,15 +137,20 @@ void computeIntervalsPolygons(string &argument, int flag){
 			pol.vertices = originalVertices;
 			pol.orderN = 16;
 
+			// if (pol.recID == 2143) {
+			
+			// 	exit(0);
+			// }
 			//combined rasterization and intervalization with no flood filling
 			timer = clock();
 			// printf("Rasterizing object %d with %ld vertices.\n", pol.recID, pol.vertices.size());
 			// rasterizeAndIntervalizeScanline(pol, sec);
+			// rasterizeAndIntervalizeHybridDDAScanline(pol, sec);
 			// rasterizeAndIntervalizeFloodFill(pol, sec);
 			intervalizeOneStep(pol, sec);
 			// printf("Rasterized and intervalized in %f seconds.\n", (clock()-timer) / (double)(CLOCKS_PER_SEC));
 			preprocessingTime += (clock()-timer) / (double)(CLOCKS_PER_SEC);
-
+			
 			//---SAVE ON DISK---
 			switch(COMPRESSION){
 				case 0:
@@ -150,8 +160,27 @@ void computeIntervalsPolygons(string &argument, int flag){
 					saveBinaryIntervalsCompressed(pol, sec.sectionID, foutALL, foutF);
 					break;
 			}		
+		
 
-
+			// test only: count how much memory it would take if we used 2 bits per cell
+			// for (int i=0; i<pol.uncompressedALL.size(); i+=2) {
+			// 	pixelBits += (pol.uncompressedALL[i+1] - pol.uncompressedALL[i] + 1) * 2;
+			// 	indicesBits += (pol.uncompressedALL[i+1] - pol.uncompressedALL[i] + 1) * 32;
+			// 	intervalBits += 2 * 32;
+			// }
+			// for (int i=0; i<pol.uncompressedF.size(); i+=2) {
+			// 	pixelBits += (pol.uncompressedF[i+1] - pol.uncompressedF[i] + 1) * 2;
+			// 	indicesBits += (pol.uncompressedF[i+1] - pol.uncompressedF[i] + 1) * 32;
+			// 	intervalBits += 2 * 32;
+			// }
+			// normalizeXYToSectionHilbert(originalMBR.pMin.x, originalMBR.pMin.y, sec.rasterxMin, sec.rasteryMin, sec.rasterxMax, sec.rasteryMax, HILBERT_n);
+			// normalizeXYToSectionHilbert(originalMBR.pMax.x, originalMBR.pMax.y, sec.rasterxMin, sec.rasteryMin, sec.rasterxMax, sec.rasteryMax, HILBERT_n);
+			// // get the hilbert cells min/max
+			// pol.minHilbertX = (uint) originalMBR.pMin.x;
+			// pol.minHilbertY = (uint) originalMBR.pMin.y;
+			// pol.maxHilbertX = (uint) originalMBR.pMax.x;
+			// pol.maxHilbertY = (uint) originalMBR.pMax.y;
+			// MBRbits += (pol.maxHilbertX - pol.minHilbertX + 1) * (pol.maxHilbertY - pol.minHilbertY + 1) * 2 + 64;
 		}
 
 
@@ -167,8 +196,12 @@ void computeIntervalsPolygons(string &argument, int flag){
 	// std::cout << "		pip time: " << pip_time << " seconds." << endl;
 
 
-
 	std::cout << "  Pre-processing time: " << preprocessingTime << " sec." << std::endl;
+	// printf("MB needed if we were to keep 2 bits per non-overlapping cell (no referencing): %f\n", ((pixelBits) / (double) 8) / 1000000);
+	// printf("MB needed if we were to keep 2 16-bit indices and 2 bits per non-overlapping cell: %f\n", ((pixelBits + (indicesBits/2)) / (double) 8) / 1000000);
+	// printf("MB needed if we were to keep 2 32-bit indices and 2 bits per non-overlapping cell: %f\n", ((pixelBits + indicesBits) / (double) 8) / 1000000);
+	// printf("MB needed if we were to keep a 2-d array with 2 bits per cell: %f\n", ((pixelBits+MBRbits) / (double) 8) / 1000000);
+	// printf("MB needed for APRIl as it is: %f\n", (intervalBits / (double) 8) / 1000000);
 
 	fin.close();
 	foutALL.close();

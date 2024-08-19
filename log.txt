@@ -1,0 +1,19 @@
+N = 16, ID set to uint
+***************************************************
+*************** APRIL configuration: **************
+-Datasets (R & S): 		T3NA & T1NA
+-Partitions: 			1
+-Compression: 			no
+-Data: 					polygon-polygon
+-Query: 				intersection join
+-Galloping: 			no
+-Granularity: 			16-16
+***************************************************
+Pipeline: 
+MBR-join -> Intermediate Filter -> Refinement Stage -> Result
+***************************************************
+
+***************************************************
+Dataset sizes 3043 (T3NA) & 123045 (T1NA) objects in the datasets.
+***************************************************
+Creating APRIL approximation for polygon dataset T3NA

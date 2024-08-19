@@ -380,6 +380,7 @@ void forwardCandidatePair(uint idA, uint idB){
                                 accepted++;
                                 // saveResultPair(idA, idB);
                                 intermediateFilterTime += (clock() - timer) / (double) CLOCKS_PER_SEC;
+                                // printf("%u,%u\n", idA, idB);
                                 return;
                         }else if(result == 2){
                                 //mark for refinement
@@ -403,6 +404,7 @@ void forwardCandidatePair(uint idA, uint idB){
                 if((*refinement_function)(idA, idB, offsetMapR, offsetMapS, finR, finS)){
                         TOTAL_RESULTS++;
                         acceptedAfterRefinement++;
+                        // printf("%u,%u\n", idA, idB);
                         // saveResultPair(idA, idB);
                 }
                 refinementTime += (clock() - timer) / (double) CLOCKS_PER_SEC;
