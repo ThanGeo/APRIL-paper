@@ -4,3 +4,4 @@ stats/
 *.o
 APRIL/*.o
 sj
+log.txt

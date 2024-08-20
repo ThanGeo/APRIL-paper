@@ -29,6 +29,9 @@ main: $(HEADERS) main.cpp $(OBJECTS)
 debug:  $(OBJECTS)
 	$(CC) -g $(DEBUGCFLAGS) $(LDFLAGS)  $(OBJECTS) $(COMPRESSION) main.cpp -o sj -Iinclude
 
+sanitize:  $(OBJECTS)
+	$(CC) -fsanitize=address -g $(DEBUGCFLAGS) $(LDFLAGS)  $(OBJECTS) $(COMPRESSION) main.cpp -o sj -Iinclude
+
 valgrind: $(OBJECTS)
 	$(CC) -g $(VALGRINDCFLAGS) $(LDFLAGS)  $(OBJECTS) $(COMPRESSION) main.cpp -o sj -Iinclude
 
