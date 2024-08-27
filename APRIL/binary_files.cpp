@@ -63,16 +63,16 @@ void saveBinaryIntervalsUncompressed(Polygon &pol, uint &sectionID, ofstream &fo
 	//write number of intervals
 	foutALL.write((char*)(&pol.numIntervalsALL), sizeof(uint));	
 	//write number of elements in vector
-	foutALL.write((char*)(&pol.numBytesALL), sizeof(uint));
+	// foutALL.write((char*)(&pol.numBytesALL), sizeof(uint));
 	//write the uncompressed data
-	foutALL.write((char*)(&pol.uncompressedALL.data()[0]), pol.numBytesALL * sizeof(ID));	
+	foutALL.write((char*)(&pol.uncompressedALL.data()[0]), pol.numIntervalsALL * 2 * sizeof(ID));	
 
 	if(pol.numIntervalsF > 0){
 		foutF.write((char*)(&pol.recID), sizeof(uint));
 		foutF.write((char*)(&sectionID), sizeof(uint));
 		foutF.write((char*)(&pol.numIntervalsF), sizeof(uint));
-		foutF.write((char*)(&pol.numBytesF), sizeof(uint));
-		foutF.write((char*)(&pol.uncompressedF.data()[0]), pol.numBytesF * sizeof(ID));
+		// foutF.write((char*)(&pol.numBytesF), sizeof(uint));
+		foutF.write((char*)(&pol.uncompressedF.data()[0]), pol.numIntervalsF * 2 * sizeof(ID));
 	}
 }
 
@@ -417,13 +417,13 @@ void loadAprilUncompressed(Dataset &set, string argument, int flag){
 		bufferIndex += sizeof(uint);
 
 		//total bytes for the compressed data
-		memcpy(&pol.numBytesALL, &buffer[bufferIndex], sizeof(uint));
-		bufferIndex += sizeof(uint);
+		// memcpy(&pol.numBytesALL, &buffer[bufferIndex], sizeof(uint));
+		// bufferIndex += sizeof(uint);
 
 		//copy uncompressed data
-		memcpy(&loadSpace32[loadIndex], &buffer[bufferIndex], pol.numBytesALL * sizeof(uint32_t));
-		loadIndex += pol.numBytesALL;
-		bufferIndex += pol.numBytesALL*sizeof(uint32_t);		
+		memcpy(&loadSpace32[loadIndex], &buffer[bufferIndex], pol.numIntervalsALL * 2 * sizeof(uint32_t));
+		loadIndex += pol.numIntervalsALL * 2;
+		bufferIndex += pol.numIntervalsALL * 2 * sizeof(uint32_t);		
 
 		//add to polygon
 		pol.uncompressedALL.insert(pol.uncompressedALL.begin(), &loadSpace32[0], loadSpace32 + loadIndex);
@@ -545,13 +545,13 @@ void loadAprilUncompressed(Dataset &set, string argument, int flag){
 		pol->numIntervalsF = numIntervals;
 
 		//total bytes for the uncompressed data
-		memcpy(&pol->numBytesF, &buffer[bufferIndex], sizeof(uint));
-		bufferIndex += sizeof(uint);
+		// memcpy(&pol->numBytesF, &buffer[bufferIndex], sizeof(uint));
+		// bufferIndex += sizeof(uint);
 
 		//copy uncompressed data
-		memcpy(&loadSpace32[loadIndex], &buffer[bufferIndex], pol->numBytesF * sizeof(uint32_t));
-		loadIndex += pol->numBytesF;
-		bufferIndex += pol->numBytesF*sizeof(uint32_t);		
+		memcpy(&loadSpace32[loadIndex], &buffer[bufferIndex], pol->numIntervalsF * 2 * sizeof(uint32_t));
+		loadIndex += pol->numIntervalsF * 2;
+		bufferIndex += pol->numIntervalsF * 2 * sizeof(uint32_t);		
 
 		//add to polygon
 		pol->uncompressedF.insert(pol->uncompressedF.begin(), &loadSpace32[0], loadSpace32 + loadIndex);

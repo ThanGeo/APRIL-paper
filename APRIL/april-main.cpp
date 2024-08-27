@@ -62,7 +62,7 @@ void computeIntervalsPolygons(string &argument, int flag){
 	preprocessingTime = 0;
 	
 	//geometry input file
-	string filename = getBinaryGeometryFilename(flag);
+	string filename = getGeometryFilepath(flag);
 	ifstream fin(filename, fstream::in | ios_base::binary);
 	//APRIL output files
 	ofstream foutALL(getIntervalALLBinaryFilename(flag), ios_base::out | ios_base::binary);
@@ -137,8 +137,7 @@ void computeIntervalsPolygons(string &argument, int flag){
 			pol.vertices = originalVertices;
 			pol.orderN = 16;
 
-			// if (pol.recID == 2143) {
-			
+			// if (pol.recID == 10) {
 			// 	exit(0);
 			// }
 			//combined rasterization and intervalization with no flood filling
@@ -198,8 +197,8 @@ void computeIntervalsPolygons(string &argument, int flag){
 
 	std::cout << "  Pre-processing time: " << preprocessingTime << " sec." << std::endl;
 	// printf("MB needed if we were to keep 2 bits per non-overlapping cell (no referencing): %f\n", ((pixelBits) / (double) 8) / 1000000);
-	// printf("MB needed if we were to keep 2 16-bit indices and 2 bits per non-overlapping cell: %f\n", ((pixelBits + (indicesBits/2)) / (double) 8) / 1000000);
-	// printf("MB needed if we were to keep 2 32-bit indices and 2 bits per non-overlapping cell: %f\n", ((pixelBits + indicesBits) / (double) 8) / 1000000);
+	// printf("MB needed if we were to keep 2 16-bit indices and 1 bit per non-overlapping cell: %f\n", (((pixelBits/2) + (indicesBits/2)) / (double) 8) / 1000000);
+	// printf("MB needed if we were to keep 2 32-bit indices and 1 bit per non-overlapping cell: %f\n", (((pixelBits/2) + indicesBits) / (double) 8) / 1000000);
 	// printf("MB needed if we were to keep a 2-d array with 2 bits per cell: %f\n", ((pixelBits+MBRbits) / (double) 8) / 1000000);
 	// printf("MB needed for APRIl as it is: %f\n", (intervalBits / (double) 8) / 1000000);
 
@@ -235,7 +234,7 @@ void computeIntervalsLinestrings(string &argument, int flag){
 	intervalizationTime = 0;
 	
 	//geometry input file
-	string filename = getBinaryGeometryFilename(flag);
+	string filename = getGeometryFilepath(flag);
 	ifstream fin(filename, fstream::in | ios_base::binary);
 
 	//APRIL output files

@@ -107,16 +107,16 @@ void saveResultPair(uint &idA, uint &idB){
 //
 //-----------------------------
 
-void initialize(string &arg1, string &arg2){
+void initialize(string &arg1, string &arg2, std::string &fileType){
         string info_message = "";
         argument1 = arg1;
         argument2 = arg2;
 
         //build file paths
-        buildFilePaths(arg1, arg2);
+        buildFilePaths(arg1, arg2, fileType);
 
-        geometryFileNameR = getBinaryGeometryFilename(0);
-        geometryFileNameS = getBinaryGeometryFilename(1);
+        geometryFileNameR = getGeometryFilepath(0);
+        geometryFileNameS = getGeometryFilepath(1);
         offsetMapR = loadOffsetMap(0);
         offsetMapS = loadOffsetMap(1);
         finR.open(geometryFileNameR, fstream::in | ios_base::binary);
@@ -141,7 +141,8 @@ void initialize(string &arg1, string &arg2){
                 //JOIN 
                 if((argument1.at(0) == 'T' && argument2.at(0) == 'T') || SELECTION_QUERY){
                         getUniversalCoordinates(0);
-                }else{
+                }else if (argument1.at(0) == 'O' && argument1.at(2) == '_' && argument2.at(0) == 'O' && argument2.at(2) == '_') {
+                        // continents
                         string continent = argument1.substr(argument1.find("_") + 1);
                         if(continent == "Oceania"){
                                 getUniversalCoordinates(1);
@@ -156,6 +157,8 @@ void initialize(string &arg1, string &arg2){
                         }else if(continent == "SouthAmerica"){
                                 getUniversalCoordinates(6);                        
                         }
+                } else {
+                        getUniversalCoordinates(7);
                 }
         }
 

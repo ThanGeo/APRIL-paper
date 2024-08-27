@@ -3,6 +3,7 @@
 Code for **APRIL: Approximating Polygons as Raster Intervals Lists**
 
 Please read the instructions in their entirety before running tests.
+This code is for reproducing the experiments of the paper and is not meant to be used as a tool. 
 
 
 ## Ιncludes

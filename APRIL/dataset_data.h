@@ -21,7 +21,7 @@
 using namespace std;
 
 /* geometry files */
-string getBinaryGeometryFilename(int flag);
+string getGeometryFilepath(int flag);
 
 /* interval files */
 string getIntervalALLBinaryFilename(int argument);
@@ -33,4 +33,4 @@ string getOffsetMap(int flag);
 
 void getUniversalCoordinates(int setcode);
 
-void buildFilePaths(string &argument1, string &argument2);
+void buildFilePaths(string &argument1, string &argument2, std::string &fileType);

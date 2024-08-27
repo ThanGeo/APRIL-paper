@@ -95,13 +95,13 @@ int main(int argc, char **argv)
     bool FLAGJOINITER  = false, FLAGSORTITER = false, FLAGPARTITER = false, FLAGCOP = false;
     double timeJoinIter = 0.0, timeSortIter = 0.0, timePartIter = 0.0, timeCopyingIter = 0.0;
 
-    //get arguments
+    //get dataset arguments
     string argument1(argv[argc-2]);
     string argument2(argv[argc-1]);
 
-    
+    std::string fileType;
 
-    while ((c = getopt(argc, argv, "sn:fezh:gwld:cqp:?")) != -1)
+    while ((c = getopt(argc, argv, "t:sn:fezh:gwld:cqp:?")) != -1)
     {
         switch (c)
         {
@@ -152,10 +152,14 @@ int main(int argc, char **argv)
                 HILBERT_POWER = atoi(optarg);
                 HILBERT_n = pow(2,HILBERT_POWER);
                 break;
+            case 't':
+                fileType.assign(optarg);
+                break;
             default:
                 break;
         }
     }
+
 
     if(SELECTION_QUERY && WITHIN){
         cout << "Error: You can't select both range query and within join as query type. " << endl;
@@ -200,7 +204,7 @@ int main(int argc, char **argv)
     }
 
     //initialize
-    initialize(argument1, argument2);
+    initialize(argument1, argument2, fileType);
 
 
     cout << "***************************************************" << endl;
@@ -209,11 +213,19 @@ int main(int argc, char **argv)
     {
         #pragma omp section
         {
-            R.load(getBinaryGeometryFilename(0));
+            if (fileType == "wkt") {
+                R.loadWKT(getGeometryFilepath(0));
+            } else {
+                R.load(getGeometryFilepath(0));
+            }
         }
         #pragma omp section
         {
-            S.load(getBinaryGeometryFilename(1));
+            if (fileType == "wkt") {
+                S.loadWKT(getGeometryFilepath(1));
+            } else {
+                S.load(getGeometryFilepath(1));
+            }
         }
     }
     cout << "Dataset sizes ";

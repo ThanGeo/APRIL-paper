@@ -1493,9 +1493,11 @@ void intervalizeOneStep(Polygon &pol, Section &sec){
 	// printf("\n");
 
 	// timer = clock();
+	// printf("Mapped in this area: (%f,%f),(%f,%f)\n", sec.rasterxMin, sec.rasteryMin, sec.rasterxMax, sec.rasteryMax);
 	// printf("MBR: (%f,%f),(%f,%f)\n", pol.mbr.pMin.x, pol.mbr.pMin.y, pol.mbr.pMax.x, pol.mbr.pMax.y);
 	// printf("Buffer width: %d\n", pol.bufferWidth);
 	// printf("Buffer height: %d\n", pol.bufferHeight);
+	// printf("MBR in pixels: %d\n", pol.bufferHeight * pol.bufferWidth);
 
 	//compute partial cells
 	// cout << "calculatng partials..." << endl;
@@ -1545,8 +1547,6 @@ void intervalizeOneStep(Polygon &pol, Section &sec){
 	// for(auto it = pol.uncompressedF.begin(); it != pol.uncompressedF.end(); it+=2){		
 	// 	cout << "[" << *it << "," << *(it+1) << ")" << endl;
 	// }
-
-
 
 	// DON'T FORGET TO DELETE THE MATRIX BEFORE RETURNING!
 	for(size_t i = 0; i < pol.bufferWidth; i++){

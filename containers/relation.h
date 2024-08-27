@@ -66,6 +66,7 @@ public:
 
 	Relation();
 	void load(string filename);
+	void loadWKT(string filename);
 	void sortByXStart();
     void sortByYStart();
 	void print(char c);

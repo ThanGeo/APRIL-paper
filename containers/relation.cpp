@@ -147,6 +147,12 @@ void Relation::load(string filename)
     
 }
 
+void Relation::loadWKT(string filename)
+{
+    printf("wkt unsupported\n");
+    exit(0);
+} 
+
 
 void Relation::sortByXStart()
 {

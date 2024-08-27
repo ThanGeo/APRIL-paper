@@ -10,45 +10,81 @@ string S_geometry_data;
 string R_offset_map_data;
 string S_offset_map_data;
 
-void buildFilePaths(string &argument1, string &argument2){
+void buildFilePaths(string &argument1, string &argument2, std::string &fileType){
+	std::string intervalDir = "APRIL/interval_data/";
 	//INTERVAL DATA
 	switch(COMPRESSION){
 		case 0:
-			intervalsRfilepath_A = "APRIL/interval_data/uncompressed/"+argument1+"_binary_interval_A_" + to_string(H) + ".dat";
-			intervalsSfilepath_A = "APRIL/interval_data/uncompressed/"+argument2+"_binary_interval_A_" + to_string(H) + ".dat";
-			intervalsRfilepath_F = "APRIL/interval_data/uncompressed/"+argument1+"_binary_interval_F_" + to_string(H) + ".dat";
-			intervalsSfilepath_F = "APRIL/interval_data/uncompressed/"+argument2+"_binary_interval_F_" + to_string(H) + ".dat";			
+			intervalsRfilepath_A = intervalDir+"uncompressed/"+argument1+"_binary_interval_A_" + to_string(H) + ".dat";
+			intervalsSfilepath_A = intervalDir+"uncompressed/"+argument2+"_binary_interval_A_" + to_string(H) + ".dat";
+			intervalsRfilepath_F = intervalDir+"uncompressed/"+argument1+"_binary_interval_F_" + to_string(H) + ".dat";
+			intervalsSfilepath_F = intervalDir+"uncompressed/"+argument2+"_binary_interval_F_" + to_string(H) + ".dat";			
 			break;
 		case 1:
-			intervalsRfilepath_A = "APRIL/interval_data/compressed/"+argument1+"_binary_interval_A_" + to_string(H) + ".dat";
-			intervalsSfilepath_A = "APRIL/interval_data/compressed/"+argument2+"_binary_interval_A_" + to_string(H) + ".dat";
-			intervalsRfilepath_F = "APRIL/interval_data/compressed/"+argument1+"_binary_interval_F_" + to_string(H) + ".dat";
-			intervalsSfilepath_F = "APRIL/interval_data/compressed/"+argument2+"_binary_interval_F_" + to_string(H) + ".dat";
+			intervalsRfilepath_A = intervalDir+"compressed/"+argument1+"_binary_interval_A_" + to_string(H) + ".dat";
+			intervalsSfilepath_A = intervalDir+"compressed/"+argument2+"_binary_interval_A_" + to_string(H) + ".dat";
+			intervalsRfilepath_F = intervalDir+"compressed/"+argument1+"_binary_interval_F_" + to_string(H) + ".dat";
+			intervalsSfilepath_F = intervalDir+"compressed/"+argument2+"_binary_interval_F_" + to_string(H) + ".dat";
 			break;
 	}
 
 	//GEOMETRY DATA
-	if(argument1.at(0) == 'T' && argument2.at(0) == 'T'){
-		//TIGER JOIN
-		R_geometry_data = "./data/" + argument1 + "_fixed_binary.dat";
-		S_geometry_data = "./data/" + argument2 + "_fixed_binary.dat";
-		R_offset_map_data = "./data/" + argument1 + "_offset_map.dat";
-		S_offset_map_data = "./data/" + argument2 + "_offset_map.dat";
-	}else if((argument1.at(0) == 'Q' || argument2.at(0) == 'Q') && SELECTION_QUERY){
-		//TIGER RANGE QUERY
-		R_geometry_data = "./data/" + argument1 + "_fixed_binary.dat";
-		S_geometry_data = "./data/" + argument2 + "_fixed_binary.dat";
-		R_offset_map_data = "./data/" + argument1 + "_offset_map.dat";
-		S_offset_map_data = "./data/" + argument2 + "_offset_map.dat";
-	}else if(argument1.at(0) == 'O' && argument1.at(2) == '_' && argument2.at(0) == 'O' && argument2.at(2) == '_'){
-		//OSM CONTINENTS
-		R_geometry_data = "./data/" + argument1 + "_fixed.dat";
-		S_geometry_data = "./data/" + argument2 + "_fixed.dat";
-		R_offset_map_data = "./data/" + argument1+ "_offset_map.dat";
-		S_offset_map_data = "./data/" + argument2+ "_offset_map.dat";
-	}else{
-		cout << "Error: No dataset data meta-mapping with specified input files: " << argument1 << " and " << argument2 << endl;
-		exit(0);
+	if (fileType != "wkt") {
+		// binary files
+		if(argument1.at(0) == 'T' && argument2.at(0) == 'T'){
+			//TIGER JOIN
+			R_geometry_data = "./data/" + argument1 + "_fixed_binary.dat";
+			S_geometry_data = "./data/" + argument2 + "_fixed_binary.dat";
+			R_offset_map_data = "./data/" + argument1 + "_offset_map.dat";
+			S_offset_map_data = "./data/" + argument2 + "_offset_map.dat";
+		}else if((argument1.at(0) == 'Q' || argument2.at(0) == 'Q') && SELECTION_QUERY){
+			//TIGER RANGE QUERY
+			R_geometry_data = "./data/" + argument1 + "_fixed_binary.dat";
+			S_geometry_data = "./data/" + argument2 + "_fixed_binary.dat";
+			R_offset_map_data = "./data/" + argument1 + "_offset_map.dat";
+			S_offset_map_data = "./data/" + argument2 + "_offset_map.dat";
+		}
+		else if (argument1.length() > 2 && argument2.length() > 2) {
+		// else if(argument1.at(0) == 'O' && argument1.at(2) == '_' && argument2.at(0) == 'O' && argument2.at(2) == '_'){
+			//OSM CONTINENTS
+			// R_geometry_data = "./data/" + argument1 + "_fixed.dat";
+			// S_geometry_data = "./data/" + argument2 + "_fixed.dat";
+			// R_offset_map_data = "./data/" + argument1+ "_offset_map.dat";
+			// S_offset_map_data = "./data/" + argument2+ "_offset_map.dat";
+			R_geometry_data = "/home/thanasis/Desktop/PhD/data_files/OSM/binary/continents/" + argument1 + "_fixed.dat";
+			S_geometry_data = "/home/thanasis/Desktop/PhD/data_files/OSM/binary/continents/" + argument2 + "_fixed.dat";
+			R_offset_map_data = "/home/thanasis/Desktop/PhD/data_files/OSM/binary/continents/" + argument1+ "_offset_map.dat";
+			S_offset_map_data = "/home/thanasis/Desktop/PhD/data_files/OSM/binary/continents/" + argument2+ "_offset_map.dat";
+		} else if (argument1.at(0) == 'O' && argument2.at(0) == 'O') {
+			// entire OSM
+			R_geometry_data = "/home/thanasis/Desktop/PhD/data_files/OSM/binary/" + argument1 + "_fixed_binary.dat";
+			S_geometry_data = "/home/thanasis/Desktop/PhD/data_files/OSM/binary/" + argument2 + "_fixed_binary.dat";
+			R_offset_map_data = "/home/thanasis/Desktop/PhD/data_files/OSM/binary/" + argument1+ "_offset_map.dat";
+			S_offset_map_data = "/home/thanasis/Desktop/PhD/data_files/OSM/binary/" + argument2+ "_offset_map.dat";
+		}
+		else{
+			cout << "Error: No dataset data meta-mapping with specified input files: " << argument1 << " and " << argument2 << endl;
+			exit(0);
+		}
+	} else {
+		// wkt files
+		if(argument1.at(0) == 'T' && argument2.at(0) == 'T'){
+			//TIGER
+			R_geometry_data = "/home/thanasis/Desktop/PhD/data_files/TIGER/original" + argument1 + "_original.wkt";
+			S_geometry_data = "/home/thanasis/Desktop/PhD/data_files/TIGER/original" + argument2 + "_original.wkt";
+			R_offset_map_data = "";
+			S_offset_map_data = "";
+		} else if (argument1.at(0) == 'O' && argument2.at(0) == 'O') {
+			// entire OSM
+			R_geometry_data = "/home/thanasis/Desktop/PhD/data_files/OSM/original" + argument1 + "_original.wkt";
+			S_geometry_data = "/home/thanasis/Desktop/PhD/data_files/OSM/original" + argument2 + "_original.wkt";
+			R_offset_map_data = "";
+			S_offset_map_data = "";
+		}
+		else{
+			cout << "Error: No dataset data meta-mapping for wkt specified input files: " << argument1 << " and " << argument2 << endl;
+			exit(0);
+		}
 	}
 
 	// cout << "File paths:" << endl;
@@ -65,7 +101,7 @@ void buildFilePaths(string &argument1, string &argument2){
 
 
 /* geometry files */
-string getBinaryGeometryFilename(int flag){
+string getGeometryFilepath(int flag){
 	switch(flag){
 		case 0:		//R
 			return R_geometry_data;
@@ -163,6 +199,12 @@ void getUniversalCoordinates(int setcode){
 		    universalMaxX = -34.78799;
 		    universalMaxY = 12.878401;
 			break;
-
+		case 7:
+			// global OSM
+			universalMinX = -180.0;
+			universalMinY = -89.98;
+			universalMaxX = 180.0;
+			universalMaxY = 83.68;
+			break;
 		}
 }
