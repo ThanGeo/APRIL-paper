@@ -141,21 +141,23 @@ void initialize(string &arg1, string &arg2, std::string &fileType){
                 //JOIN 
                 if((argument1.at(0) == 'T' && argument2.at(0) == 'T') || SELECTION_QUERY){
                         getUniversalCoordinates(0);
-                }else if (argument1.at(0) == 'O' && argument1.at(2) == '_' && argument2.at(0) == 'O' && argument2.at(2) == '_') {
-                        // continents
-                        string continent = argument1.substr(argument1.find("_") + 1);
-                        if(continent == "Oceania"){
-                                getUniversalCoordinates(1);
-                        }else if(continent == "Asia"){
-                                getUniversalCoordinates(2);
-                        }else if(continent == "Europe"){
-                                getUniversalCoordinates(3);
-                        }else if(continent == "NorthAmerica"){
-                                getUniversalCoordinates(4);                        
-                        }else if(continent == "Africa"){
-                                getUniversalCoordinates(5);                        
-                        }else if(continent == "SouthAmerica"){
-                                getUniversalCoordinates(6);                        
+                } else if (argument1.size() > 2 && argument2.size() > 2) {
+                        if (argument1.at(0) == 'O' && argument1.at(2) == '_' && argument2.at(0) == 'O' && argument2.at(2) == '_') {
+                                // continents
+                                string continent = argument1.substr(argument1.find("_") + 1);
+                                if(continent == "Oceania"){
+                                        getUniversalCoordinates(1);
+                                }else if(continent == "Asia"){
+                                        getUniversalCoordinates(2);
+                                }else if(continent == "Europe"){
+                                        getUniversalCoordinates(3);
+                                }else if(continent == "NorthAmerica"){
+                                        getUniversalCoordinates(4);                        
+                                }else if(continent == "Africa"){
+                                        getUniversalCoordinates(5);                        
+                                }else if(continent == "SouthAmerica"){
+                                        getUniversalCoordinates(6);                        
+                                }
                         }
                 } else {
                         getUniversalCoordinates(7);

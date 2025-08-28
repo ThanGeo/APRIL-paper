@@ -109,8 +109,11 @@ void Relation::load(string filename)
 
     //first read the total polygon count
     file.read((char*) &polygonCount, sizeof(int));
+    // printf("Pol count: %d\n", polygonCount);
     //read polygons
     for(int j=0; j<polygonCount; j++){
+
+        // printf("pol: %d\n", j);
 
         Coord minXmbr, minYmbr, maxXmbr, maxYmbr;
         minXmbr = std::numeric_limits<Coord>::max();

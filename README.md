@@ -1,10 +1,12 @@
-# APRIL
+# APRIL - Raster interval object approximations for spatial intersection joins
 
-Code for **APRIL: Approximating Polygons as Raster Intervals Lists**
+This repository contains the source code for the "Raster interval object approximations for spatial intersection joins" paper, published in the VLDB Journal, Vol. 34, 2025 ([paper link](https://link.springer.com/article/10.1007/s00778-024-00887-4)).
 
-Please read the instructions in their entirety before running tests.
-This code is for reproducing the experiments of the paper and is not meant to be used as a tool. 
+Please read the instructions in their entirety before running the tests.
+This code is mostly for reproducing the experiments of the paper. A better, more user-friendly version of the code exists in [this repository](https://github.com/ThanGeo/APRIL-complete).
 
+## Abstract 
+Spatial join processing techniques that identify intersections between complex geometries (e.g., polygons) commonly follow a two-step filter-and-refine pipeline. The filter step evaluates the query predicate on the minimum bounding rectangles (MBRs) of the geometries, while the refinement step eliminates false positives by applying the query on the exact geometries. To accelerate spatial join evaluation over complex geometries, we propose a raster intervals approximation of object geometries and introduce a powerful intermediate step in the pipeline. In a preprocessing phase, our method (i) rasterizes each object geometry using a fine grid, (ii) models groups of nearby cells that intersect the polygon as an interval, and (iii) encodes each interval with a bitstring capturing the overlap of each cell in it with the polygon. Going one step further, we improve our approach by approximating each object with two sets of intervals that succinctly capture the raster cells that (i) intersect with the object and (ii) are fully contained within the object. Using this representation, we show that we can verify whether two polygons intersect through a sequence of linear-time joins between the interval sets. Our approximations are effectively compressible and customizable for partitioned data and polygons of varying sizes, rasterized at different granularities. Finally, we propose a novel algorithm that computes the interval approximation of a polygon without fully rasterizing it first, rendering the computation of approximations orders of magnitude faster. Experiments on real data demonstrate the effectiveness and efficiency of our proposal over previous work.
 
 ## Ιncludes
 - simple and 2-grid rasterization algorithms with decisioning
@@ -21,7 +23,7 @@ This code is for reproducing the experiments of the paper and is not meant to be
 - OpenMP
 
 
-## DATASETS
+## Datasets
 ### Download
 
 In this Google Drive link (https://drive.google.com/drive/folders/1AMOy2q9NGFnJ1eSXXJU82enFmTYXxryV?usp=share_link) there are 2 text files that describe the binary format we used for our binary input datasets. You can also find the modified binary TIGER datasets that we used for our experiments there. Each data set is accompanied by a binary offset map, which is necessary to reduce the geometry retrieval cost from disk during the refinement phase. If the user wishes to use custom datasets, they have to create both the binary geometry files and their map using the above formats. Then, they have to edit the `dataset_data.cpp` file in order for the program to locate the new files.
@@ -136,9 +138,23 @@ For the flood filling, we drew from this *Scanline Floodfill Algorithm With Stac
 For the polygon triangulation needed for the OpenGL experiments (not included, tested in controlled environment), we used the *clip2tri* library (https://github.com/raptor/clip2tri)
 
 
-## Copyright
+## Citation
+If you use either this work or the code from [this repository](https://github.com/ThanGeo/APRIL-complete) in your research, please cite:
 
-Full
+```bibtex
+@article{GeorgiadisZM25,
+  author       = {Thanasis Georgiadis and
+                  Eleni Tzirita Zacharatou and
+                  Nikos Mamoulis},
+  title        = {Raster interval object approximations for spatial intersection joins},
+  journal      = {{VLDB} J.},
+  volume       = {34},
+  number       = {1},
+  pages        = {8},
+  year         = {2025},
+}
+```
 
 ## Acknowledgments
-This work has been supported by the Hellenic Foundation for Research and Innovation (HFRI) under the “2nd Call for HFRI Research Projects to support Faculty Members & Researchers” (Project No. 2757)
+This work has been supported by the Hellenic Foundation for Research and Innovation (H.F.R.I.) under the "2nd Call for H.F.R.I. Research Projects to support Faculty Members & Researchers" (Project Number: 2757).
+![Alt text](ELIDEK.jpeg?raw=true "H.F.R.I.")
